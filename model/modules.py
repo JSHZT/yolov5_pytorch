@@ -1,3 +1,4 @@
+from turtle import forward
 import torch
 import torch.nn as nn
 
@@ -109,3 +110,11 @@ class CSP2_x(nn.Module):
     
     def forward(self, x):
         return self.tie(torch.cat([self.up(x), self.down(x)], dim=1))
+    
+class UPsample(nn.Module):
+    def __init__(self, scale_factor=2) -> None:
+        super().__init__()
+        self.upsample = nn.Upsample(scale_factor=scale_factor, mode='nearest')
+        
+    def forward(self, x):
+        return self.upsample(x)
