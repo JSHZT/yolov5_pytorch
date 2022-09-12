@@ -1,8 +1,8 @@
-from turtle import forward
 import torch
 import torch.nn as nn
 
 def autopad(k):
+    #保持分辨率，自动计算pading
     p = k // 2 if isinstance(k, int) else [i // 2 for i in k]
     return p
 
