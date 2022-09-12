@@ -92,20 +92,25 @@ class CSP2_x(nn.Module):
         e:[depth, weight]深度和宽度控制参数
         '''
         super().__init__()
-        input_c = round(input_c * e[1])
+        #input_c = round(input_c * e[1])
         output_c = round(output_c * e[1])
-        c_ = input_c // 2
-        self.CBL_n = nn.Sequential(*[CBL(c_, c_, 1, 1, 0) for _ in range(n)])
+        n = round(n * e[0])
+        c_ = round(input_c * e[1])
+        self.CBL_2 = nn.Sequential(
+            CBL(input_c, c_, 1, 1, 0),
+            CBL(c_, c_, 1, 1, 0)
+        )
+        self.CBL_2n = nn.Sequential(*[self.CBL_2 for _ in range(n)])
         self.up = nn.Sequential(
             CBL(input_c, c_, k, s, autopad(k), g, act), 
-            self.CBL_n,
+            self.CBL_2n,
             nn.Conv2d(c_, c_, 1, 1, 0)
         )
-        self.down = nn.Conv2d(input_c, c_, 1, 1, 0, bias=False)
+        self.down = nn.Conv2d(input_c, c_, 1, 1, 0)
         self.tie = nn.Sequential(
             nn.BatchNorm2d(c_ * 2),
             nn.LeakyReLU(),
-            CBL(c_ * 2, output_c, 1, 1, 0, bias=False)
+            CBL(c_ * 2, output_c, 1, 1, 0)
         )
     
     def forward(self, x):
